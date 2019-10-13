@@ -1,0 +1,107 @@
+{% extends "navbar.html" %}
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">Project [{{ case.suite.project.name }}]</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('project.detail', project_id = case.suite.project.id) }}">Test Suites [{{ case.suite.name }}]</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('api.show_test_cases', suite_id = case.suite.id) }}">Test Cases [{{ case.name }}]</a></li>
+        <li class="breadcrumb-item active">Run History</li>
+    </ol>
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+	    <a href="#" class="close" data-dismiss="alert">
+		&times;
+	    </a>
+	    <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    <div style="margin-bottom:20px">
+        <nav class="navbar navbar-expand-sm navbar-dark">
+            <form class="form-inline">
+                <input class="form-control" type="text" placeholder="Search" style="border-radius:1.75rem;border:1px solid #ced4da;">
+                <button class="btn btn-success" type="button" style="margin-left:10px;">Search</button>
+            </form>
+        </nav>
+    </div>
+    {% if responses %}
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Case Name</th>
+                    <th>Status</th>
+                    <th>Start time</th>
+                    <th>End time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for response in responses %}
+                {% if response.status == "waiting" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ response.case_name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.start_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.end_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=response.case_id) }}">Details</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_response', response_id=response.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif response.status == "running" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ response.case_name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.start_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.end_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=response.case_id) }}">Details</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_response', response_id=response.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif response.status == "success" %}
+                <tr class="table-success">
+                    <td style="border-top-width:5px;border-color:white;">{{ response.case_name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.start_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.end_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=response.case_id) }}">Details</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_response', response_id=response.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif response.status == "failed" %}
+                <tr class="table-danger">
+                    <td style="border-top-width:5px;border-color:white;">{{ response.case_name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.start_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.end_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=response.case_id) }}">Details</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_response', response_id=response.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif response.status == "error" %}
+                <tr class="table-warning">
+                    <td style="border-top-width:5px;border-color:white;">{{ response.case_name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.start_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ response.end_time }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=response.case_id) }}">Details</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_response', response_id=response.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <hr style="border-top:3px solid rgba(0,0,0,.1);">
+    <div class="container text-center">
+        <h4>This case is not executed, you can run now</h4>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

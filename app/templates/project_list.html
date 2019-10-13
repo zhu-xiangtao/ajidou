@@ -1,0 +1,59 @@
+{% extends "navbar.html" %}
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-success">
+	    <a href="#" class="close" data-dismiss="alert">
+		&times;
+	    </a>
+	    <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    <div style="margin-bottom:20px">
+        <nav class="navbar navbar-expand-sm navbar-dark">
+            <form class="form-inline">
+                <input class="form-control" type="text" placeholder="Search" style="border-radius:1.75rem;border:1px solid #ced4da;">
+                <button class="btn btn-success" type="button" style="margin-left:10px;">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item" style="margin:0px 5px;">
+                    <a class="nav-link btn btn-primary" href="{{ url_for('project.create_project') }}">Create Porject</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div>
+        {% if projects %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>Project Creater</th>
+                    <th>Project description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr style="background-color:#e9ecef;">
+                    <td style="border-top-width:5px;border-color:white;">{{ project.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ project.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{% if project.description %}{{ project.description }}{% endif %}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('project.edit_project', project_id = project.id) }}">Edit</a>
+                        <a class="btn btn-success" href="{{ url_for('project.detail', project_id = project.id) }}">Detail</a>
+                        <a class="btn btn-danger" href="{{ url_for('project.delete_project', project_id = project.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <hr style="border-top:3px solid rgba(0,0,0,.1);">
+        <div class="container text-center">
+            <h4>Not found any project, you can add first</h4>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

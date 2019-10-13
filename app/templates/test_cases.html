@@ -1,0 +1,126 @@
+{% extends "navbar.html" %}
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    {% if project %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">Project [{{ project.name }}]</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('project.detail', project_id = project.id) }}">Test Suites [{{ suite.name }}]</a></li>
+        <li class="breadcrumb-item active">Test Cases</li>
+    </ol>
+    {% endif %}
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-success">
+	    <a href="#" class="close" data-dismiss="alert">
+		&times;
+	    </a>
+	    <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    <div style="margin-bottom:20px">
+        <nav class="navbar navbar-expand-sm navbar-dark">
+            <form class="form-inline">
+                <input class="form-control" type="text" placeholder="Search" style="border-radius:1.75rem;border:1px solid #ced4da;">
+                <button class="btn btn-success" type="button" style="margin-left:10px;">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item" style="margin:0 10px;">
+                    <a class="nav-link btn btn-primary" href="{{ url_for('api.add_test_case', suite_id=suite.id) }}">Add Test Case</a>
+                </li>
+                <li class="nav-item" style="margin:0 10px;">
+                    <a class="nav-link btn btn-primary" href="{{ url_for('api.run_test_cases', suite_id=suite.id) }}">Run Test Case</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% if cases %}
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Case Name</th>
+                    <th>Creater</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for case in cases %}
+                {% if case.status == "waiting" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "running" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "success" %}
+                <tr class="table-success">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "failed" %}
+                <tr class="table-danger">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "error" %}
+                <tr class="table-warning">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ case.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ case.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{% if case.status %}{{ case.status }}{% endif %}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_case', case_id=case.id) }}">Details</a>
+                        <a class="btn btn-success" href="{{ url_for('api.history', case_id=case.id) }}">History</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_case', case_id=case.id) }}">Delete</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <hr style="border-top:3px solid rgba(0,0,0,.1);">
+    <div class="container text-center">
+        <h4>Not found any test case, you can add first</h4>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

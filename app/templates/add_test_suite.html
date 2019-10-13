@@ -1,0 +1,124 @@
+{% extends "navbar.html" %}
+{% block codemirror %}
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/lib/codemirror.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/fold/foldgutter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/hint/show-hint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/lint/lint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/theme/dracula.css') }}">
+
+<script src="{{ url_for('static',filename='codemirror/lib/codemirror.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/comment/comment.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/selection/active-line.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/keymap/sublime.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/hint/show-hint.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/mode/python/python.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/lint/lint.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/lint/javascript-lint.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/fold/foldcode.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/foldgutter.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/brace-fold.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/indent-fold.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/comment-fold.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/edit/closebrackets.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/edit/matchbrackets.js') }}"></script>
+
+<script src="{{ url_for('static',filename='js/main.js') }}"></script>
+<script src="{{ url_for('static',filename='js/server.js') }}"></script>
+<script>
+    $(document).ready(function(){
+        var codeEditor1 = $(".suite-pre-request-editor")[0];
+	    window.pre_request_editor = show_editor(codeEditor1);
+
+	    var codeEditor2 = $(".variables-editor")[0];
+	    window.variables_editor = show_editor(codeEditor2);
+
+	    function show_editor(editor){
+            var codeEditor = CodeMirror.fromTextArea(editor,{
+                mode: "python",
+                theme: "dracula",
+                keyMap: "sublime",
+                lineNumbers: true,
+                smartIndent: true,
+                indentUnit: 4,
+                indentWithTabs: true,
+                lineWrapping: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+                foldGutter: true,
+                autofocus: true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                styleActiveLine: true,
+            });
+            codeEditor.on("keypress", function(){
+                codeEditor.showHint(); // 注意，注释了CodeMirror库中show-hint.js第131行的代码（阻止了代码补全，同时提供智能提示）
+            });
+	        return codeEditor
+        }
+
+        function refresh_variables_editor(){
+            setTimeout(function(){
+                window.variables_editor.refresh();
+            },300);
+        }
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="container-fluid">
+        <h2>Add Test Suite</h2>
+        <div class="form-group input-group-lg">
+            <h6>Name</h6>
+            <input type="text" class="form-control" id="suite_name" name="suite_name">
+         </div>
+        <div class="form-group input-group-lg">
+            <h6>Creater</h6>
+            <input type="text" class="form-control" id="suite_creater" name="suite_creater">
+         </div>
+        <div class="form-group input-group-lg">
+            <h6>Project</h6>
+            <select class="form-control" name="project" id="project">
+                {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.id }}--{{ project.name }}--{{ project.creater }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group input-group-lg">
+            <h6>Description</h6>
+            <textarea class="form-control" id="suite_desc" name="suite_desc"></textarea>
+        </div>
+        <hr style="border-top:3px solid rgba(0,0,0,.1);">
+        <div style="margin:20px auto;">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#suite-pre-scripts" data-toggle="pill"><strong>Pre-request Scripts</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#variables" onclick="refresh_variables_editor()" data-toggle="pill"><strong>Variables</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="margin-top:20px;margin-bottom:10px;">
+                <div id="suite-pre-scripts" class="container-fluid tab-pane active">
+                    <textarea class="suite-pre-request-editor"></textarea>
+                </div>
+                <div id="variables" class="container-fluid tab-pane">
+                    <textarea class="variables-editor"></textarea>
+                </div>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <a class="btn btn-primary btn-lg" onclick="add_test_suite()" style="width:150px;border-radius:1.75rem;">submit</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

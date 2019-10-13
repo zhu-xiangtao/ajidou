@@ -1,0 +1,212 @@
+{% extends "navbar.html" %}
+{% block codemirror %}
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/lib/codemirror.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/fold/foldgutter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/hint/show-hint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/addon/lint/lint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='codemirror/theme/dracula.css') }}">
+
+<script src="{{ url_for('static',filename='js/server.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/lib/codemirror.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/comment/comment.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/selection/active-line.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/keymap/sublime.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/hint/show-hint.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/mode/python/python.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/lint/lint.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/lint/javascript-lint.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/fold/foldcode.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/foldgutter.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/brace-fold.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/indent-fold.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/fold/comment-fold.js') }}"></script>
+
+<script src="{{ url_for('static',filename='codemirror/addon/edit/closebrackets.js') }}"></script>
+<script src="{{ url_for('static',filename='codemirror/addon/edit/matchbrackets.js') }}"></script>
+
+<script src="{{ url_for('static',filename='js/index.js') }}"></script>
+<script src="{{ url_for('static',filename='js/main.js') }}"></script>
+<script src="{{ url_for('static',filename='js/server.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="container-fluid">
+        <h2>Request Basic Information</h2>
+        <div class="row" style="background-color:#e9ecef;border-radius:0.75rem;margin:15px 5px;">
+            <div class="input-group mb-3 mt-3 ml-3 mr-3">
+                <div class="input-group-prepend">
+                    <select class="form-control" name="method" id="method">
+                        {% if response.request.method == "get" %}
+                        <option value="get" selected>GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                        {% elif response.request.method == "post" %}
+                        <option value="get">GET</option>
+                        <option value="post" selected>POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                        {% elif response.request.method == "put" %}
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put" selected>PUT</option>
+                        <option value="delete">DELETE</option>
+                        {% elif response.request.method == "delete" %}
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete" selected>DELETE</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <input type="text" class="form-control" id="url" name="url" placeholder="http://" value="{{ response.request.url }}">
+                <a class="btn btn-primary" onclick="edit_test_case({{ case_id }}, {{ suite_id }})">Save</a>
+            </div>
+        </div>
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#requests-params" data-toggle="tab"><strong>Params</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#requests-data" onclick="refresh_request_data_editor()" data-toggle="tab"><strong>Body Data</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#requests-files" data-toggle="tab"><strong>Files Upload</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#requests-headers" data-toggle="tab"><strong>Headers</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#pre_script" onclick="refresh_pre_script_editor()" data-toggle="tab"><strong>Pre-request Script</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#post_script" onclick="refresh_post_script_editor()" data-toggle="tab"><strong>Post-request Script</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="requests-params" class="container-fluid tab-pane active">
+                    <p>Query Params</p>
+                    {% if response.request.params %}
+                    {% for key in response.request.params %}
+                    <div class="row" style="background-color:#e9ecef;border-radius:0.75rem;margin:15px 5px;">
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Key:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" value="{{ key }}" class="form-control key" name="params-key"></div>
+                        </div>
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Value:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" value="{{ response.request.params[key] }}" class="form-control key" name="params-key"></div>
+                        </div>
+                        <div style="width:180px; margin:0 auto;">
+                            <strong>Action</strong>
+                            <div style="margin:10px 5px 15px;">
+                                <a class="btn btn-primary btn-sm" onclick="addRow(this)">Add</a>
+                                <a class="btn btn-danger btn-sm" onclick="deleteRow('requests-params',this)">Delete</a>
+                                <a class="btn btn-success btn-sm" onclick="clearRow(this)">Clear</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="row" style="background-color:#e9ecef;border-radius:0.75rem;margin:15px 5px;">
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Key:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control key" name="params-key"></div>
+                        </div>
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Value:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control key" name="params-key"></div>
+                        </div>
+                        <div style="width:180px; margin:0 auto;">
+                            <strong>Action</strong>
+                            <div style="margin:10px 5px 15px;">
+                                <a class="btn btn-primary btn-sm" onclick="addRow(this)">Add</a>
+                                <a class="btn btn-danger btn-sm" onclick="deleteRow('requests-params',this)">Delete</a>
+                                <a class="btn btn-success btn-sm" onclick="clearRow(this)">Clear</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div id="requests-data" class="container-fluid tab-pane fade">
+                    <p>Body Data</p>
+                    <textarea class="requests-data-editor"></textarea>
+                </div>
+                <div id="requests-files" class="container-fluid tab-pane fade">
+                    <p>Files Upload</p>
+                </div>
+                <div id="requests-headers" class="container-fluid tab-pane fade">
+                    <p>Headers</p>
+                    {% if response.request.headers %}
+                    {% for key in response.request.headers %}
+                    <div class="row" style="background-color:#e9ecef;border-radius:0.75rem;margin:15px 5px;">
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Key:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control key" value="{{ key }}" name="headers-key"></div>
+                        </div>
+                        <div class="col">
+                            <!--<label for="testname">Value</label>-->
+                            <strong>Value:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control value" value="{{ response.request.headers[key] }}" name="headers-value"></div>
+                        </div>
+                        <div style="width:180px; margin:0 auto;">
+                            <strong>Action</strong>
+                            <div style="margin:10px 5px 15px;">
+                                <a class="btn btn-primary btn-sm" onclick="addRow(this)">Add</a>
+                                <a class="btn btn-danger btn-sm" onclick="deleteRow('requests-headers',this)">Delete</a>
+                                <a class="btn btn-success btn-sm" onclick="clearRow(this)">Clear</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="row" style="background-color:#e9ecef;border-radius:0.75rem;margin:15px 5px;">
+                        <div class="col">
+                            <!--<label for="testname">Key</label>-->
+                            <strong>Key:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control key" name="headers-key"></div>
+                        </div>
+                        <div class="col">
+                            <!--<label for="testname">Value</label>-->
+                            <strong>Value:</strong>
+                            <div style="margin:10px 5px 15px;"><input type="text" class="form-control value" name="headers-value"></div>
+                        </div>
+                        <div style="width:180px; margin:0 auto;">
+                            <strong>Action</strong>
+                            <div style="margin:10px 5px 15px;">
+                                <a class="btn btn-primary btn-sm" onclick="addRow(this)">Add</a>
+                                <a class="btn btn-danger btn-sm" onclick="deleteRow('requests-headers',this)">Delete</a>
+                                <a class="btn btn-success btn-sm" onclick="clearRow(this)">Clear</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div id="pre_script" class="container-fluid tab-pane fade">
+                    <p>Pre-request Script</p>
+                    <textarea class="pre-script-editor"></textarea>
+                </div>
+                <div id="post_script" class="container-fluid tab-pane fade">
+                    <p>Post-request Script</p>
+                    <textarea class="post-script-editor"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
