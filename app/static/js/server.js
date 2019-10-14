@@ -129,7 +129,7 @@ function add_test_suite(){
         dataType: "json",
         success: function(data,status,xhr){
            if(data.status == "success"){
-                window.location.href = "http://127.0.0.1:5000/detail/" + project_id;
+                window.location.href = "http://127.0.0.1:5000/test_suites/" + project_id;
            }
         }
     })
@@ -389,6 +389,48 @@ function edit_project(project_id){
         success: function(data,status,xhr){
             if(data.status == "success"){
                 window.location.href = "http://127.0.0.1:5000/project_list";
+            }
+        }
+    })
+}
+
+
+function add_test_runner(project_id){
+    var request_data = {};
+    var runner_name = $("#runner_name").val();
+    if(runner_name){
+        request_data["runner_name"] =  runner_name;
+    }else{
+        alert("Please edit runner name!");
+        return
+    }
+    var runner_creater = $("#runner_creater").val();
+    if(runner_creater){
+        request_data["runner_creater"] =  runner_creater;
+    }else{
+        alert("Please edit runner creater!");
+        return
+    }
+    var runner_desc = $("#runner_desc").val();
+    if(runner_desc){
+        request_data["runner_desc"] =  runner_desc;
+    }
+    var suite_id = $("#suite").val();
+    if(suite_id){
+        request_data["suite_id"] = suite_id;
+    }else{
+        alert("Please select test suite!");
+        return
+    }
+
+    $.ajax({
+        url: "http://127.0.0.1:5000/add_test_runner/" + project_id,
+        type: "post",
+        data: request_data,
+        dataType: "json",
+        success: function(data,status,xhr){
+            if(data.status == "success"){
+                window.location.href = "http://127.0.0.1:5000/show_test_runner/" + project_id;
             }
         }
     })

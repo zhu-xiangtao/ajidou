@@ -15,6 +15,7 @@ class Project(db.Model):
     description = db.Column(db.String(360))
 
     suites = db.relationship("TestSuite", backref="project", lazy="dynamic")
+    runners = db.relationship("TestRunner", backref="project", lazy="dynamic")
 
     def __repr__(self):
         return "Project: {}".format(self.name)
@@ -93,7 +94,21 @@ class Response(db.Model):
         return "Response: {}".format(self.status_code)
 
 
+runner_case = db.Table("runner_case",
+                       db.Column("runner_id", db.Integer, db.ForeignKey('test_runner.id'),primary_key=True),
+                       db.Column("csae_id", db.Integer, db.ForeignKey('test_case.id'),primary_key=True),
+                       )
 
+
+class TestRunner(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(120), nullable = False)
+    creater = db.Column(db.String(120), nullable = False)
+    description = db.Column(db.String(360))
+    status = db.Column(db.String(8))
+
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
+    test_cases = db.relationship("TestCase", secondary = runner_case, backref=db.backref('runners'))
 
 
 

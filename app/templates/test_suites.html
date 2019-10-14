@@ -1,21 +1,37 @@
 {% extends "navbar.html" %}
+{% block codemirror %}
+<script src="{{ url_for('static',filename='js/server.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Select Test Suite</h5>
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Add Test Run</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group input-group-lg">
+            <h6>Name</h6>
+            <input type="text" class="form-control" id="runner_name" name="runner_name">
+         </div>
+                    <div class="form-group input-group-lg">
+                        <h6>Creater</h6>
+                        <input type="text" class="form-control" id="runner_creater" name="runner_creater">
+                     </div>
+                    <div class="form-group input-group-lg">
+                        <h6>Description</h6>
+                        <textarea class="form-control" id="runner_desc" name="runner_desc"></textarea>
+                    </div>
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <label class="input-group-text" for="inputGroupSelect01">Test Suite</label>
+                            <label class="input-group-text" for="suite">Test Suite</label>
                         </div>
-                        <select class="custom-select" id="inputGroupSelect01">
+                        <select class="custom-select" id="suite">
                             {% for suite in suites %}
                             <option value="{{ suite.id }}">{{ suite.id }}--{{ suite.name }}--{{ suite.creater }}</option>
                             {% endfor %}
@@ -24,13 +40,13 @@
                 </div>
                 <div class="modal-footer">
                     <a class="btn btn-secondary" data-dismiss="modal">Close</a>
-                    <a class="btn btn-primary" href="{{ url_for('runner.add_test_runner') }}">Confirm</a>
+                    <a class="btn btn-primary" onclick="add_test_runner({{ project_id }})">Confirm</a>
                 </div>
             </div>
         </div>
     </div>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item">Project [{{ project_name }}]</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('project.show_project') }}">Project [{{ project_name }}]</a></li>
         <li class="breadcrumb-item active">Test Suites</li>
     </ol>
     {% for message in get_flashed_messages() %}
@@ -49,9 +65,6 @@
             </form>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item" style="margin:0px 5px;">
-                    <a class="nav-link btn btn-primary">Export</a>
-                </li>
-                <li class="nav-item" style="margin:0px 5px;">
                     <a class="nav-link btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Add Test Run</a>
                 </li>
                 <li class="nav-item" style="margin:0px 5px;">
@@ -67,83 +80,21 @@
                 <tr>
                     <th>Suite Name</th>
                     <th>Creater</th>
-                    <th>Status</th>
                     <th>Belong to Project</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for suite in suites %}
-                {% if suite.status == "waiting" %}
-                <tr class="table-secondary">
+                <tr style="background-color:#e9ecef;">
                     <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
                     <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
                     <td style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</td>
                     <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
+                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Show Cases</a>
+                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete Suite</a>
                     </td>
                 </tr>
-                {% elif suite.status == "running" %}
-                <tr class="table-secondary">
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
-                    </td>
-                </tr>
-                {% elif suite.status == "success" %}
-                <tr class="table-success">
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
-                        <a class="btn btn-success">History</a>
-                    </td>
-                </tr>
-                {% elif suite.status == "failed" %}
-                <tr class="table-danger">
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
-                        <a class="btn btn-success">History</a>
-                    </td>
-                </tr>
-                {% elif suite.status == "error" %}
-                <tr class="table-warning">
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
-                    <th style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</th>
-                    <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
-                        <a class="btn btn-success">History</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr class="table-secondary">
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.creater }}</td>
-                    <td style="border-top-width:5px;border-color:white;">{% if suite.status %}{{ suite.status }}{% endif %}</td>
-                    <td style="border-top-width:5px;border-color:white;">{{ suite.project.name }}</td>
-                    <td style="border-top-width:5px;border-color:white;">
-                        <a class="btn btn-primary" href="{{ url_for('api.show_test_cases', suite_id=suite.id) }}">Details</a>
-                        <a class="btn btn-danger" href="{{ url_for('api.delete_test_suite', suite_id=suite.id) }}">Delete</a>
-                    </td>
-                </tr>
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>

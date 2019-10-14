@@ -1,0 +1,114 @@
+{% extends "navbar.html" %}
+{% block content %}
+<div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">Project [{{ project_name }}]</li>
+        <li class="breadcrumb-item active">Test Runner</li>
+    </ol>
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-success">
+	    <a href="#" class="close" data-dismiss="alert">
+		&times;
+	    </a>
+	    <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+    <div style="margin-bottom:20px">
+        <nav class="navbar navbar-expand-sm navbar-dark">
+            <form class="form-inline">
+                <input class="form-control" type="text" placeholder="Search" style="border-radius:1.75rem;border:1px solid #ced4da;">
+                <button class="btn btn-success" type="button" style="margin-left:10px;">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item" style="margin:0 10px;">
+                    <a class="nav-link btn btn-primary">Add Test Runner</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% if runners %}
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Runner Name</th>
+                    <th>Runner Creater</th>
+                    <th>Runner Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for runner in runners %}
+                {% if runner.status == "waiting" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="{{ url_for('runner.runner_detail', runner_id = runner.id) }}">Detail</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% elif runner.status == "running" %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="#">Details</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "success" %}
+                <tr class="table-success">
+                   <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="#">Details</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "failed" %}
+                <tr class="table-danger">
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="#">Details</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% elif case.status == "error" %}
+                <tr class="table-warning">
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="#">Details</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="table-secondary">
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.name }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.creater }}</td>
+                    <td style="border-top-width:5px;border-color:white;">{{ runner.status }}</td>
+                    <td style="border-top-width:5px;border-color:white;">
+                        <a class="btn btn-primary" href="#">Details</a>
+                        <a class="btn btn-danger" href="#">Delete</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <hr style="border-top:3px solid rgba(0,0,0,.1);">
+    <div class="container text-center">
+        <h4>Not found any test case, you can add first</h4>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -63,14 +63,15 @@ def edit_project(project_id):
     return render_template("edit_project.html", project=project_info.get("data"))
 
 
-@bp.route("/detail/<project_id>")
+@bp.route("/test_suites/<project_id>")
 def detail(project_id):
     content = projectManager.find_project(project_id)
     project_info = content.get("data")
     suites = project_info.get("suites")
     project_name = project_info.get("name")
+    project_id = project_info.get("id")
 
-    return render_template("test_suites.html", suites = suites, project_name = project_name)
+    return render_template("test_suites.html", suites = suites, project_name = project_name, project_id = project_id)
 
 
 
